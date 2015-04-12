@@ -17,7 +17,7 @@ import javax.inject.Inject;
  */
 public class LumberjackInput extends MessageInput {
 
-    private static final String NAME = "Logstash Lumberjack Input";
+    private static final String NAME = "Logstash-forwarder Input";
 
     @AssistedInject
     public LumberjackInput(MetricRegistry metricRegistry,  @Assisted Configuration configuration,

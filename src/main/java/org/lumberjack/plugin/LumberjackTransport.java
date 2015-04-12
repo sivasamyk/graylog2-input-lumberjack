@@ -139,12 +139,12 @@ public class LumberjackTransport implements Transport {
             cr.addField(new TextField(CK_BIND_IP,
                     "Bind IP Address",
                     "0.0.0.0",
-                    "IP Address to bind",
+                    "Local IP Address to bind",
                     ConfigurationField.Optional.NOT_OPTIONAL));
             cr.addField(new NumberField(CK_BIND_PORT,
                     "Port",
                     5043,
-                    "The port to listen for events from logstash forwarder",
+                    "Local port to listen for events",
                     ConfigurationField.Optional.NOT_OPTIONAL,
                     NumberField.Attribute.IS_PORT_NUMBER));
             return cr;

@@ -19,7 +19,7 @@ public class LumberjackInputPluginMetaData implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "Logstash Lumberjack Input";
+        return "Logstash-forwarder Input";
     }
 
     @Override
