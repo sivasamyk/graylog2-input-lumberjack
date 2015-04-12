@@ -1,10 +1,5 @@
 # Graylog Logstash forwarder Lumberjack Input Plugin
 
-Welcome to your new Graylog plugin!
-
-Please refer to http://docs.graylog.org/en/latest/pages/plugins.html for documentation on how to write
-plugins for Graylog.
-
 This plugin provides support for [logstash-forwarder](https://github.com/elastic/logstash-forwarder) lumberjack protocol.
 
 * Support for reading from files
