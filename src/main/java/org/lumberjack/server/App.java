@@ -13,14 +13,16 @@ public class App
         LogEventListener logEventListener = new LogEventListener() {
             public void onEvents(List<LogEvent> logEvents) {
                 for(LogEvent event : logEvents) {
-                   // System.out.println(event);
+                    System.out.println(event);
                 }
             }
         };
         ServerConfiguration configuration = new ServerConfiguration();
+        configuration.setIpAddress("0.0.0.0");
         configuration.setPort(5043);
-        configuration.setKeyStorePass("password");
-        configuration.setKeyStorePass("/path/to/keystore.jks");
+        configuration.setKeyStorePass("pass");
+        configuration.setKeyPass("pass");
+        configuration.setKeyStorePath("/path/to/store.jks");
         new LumberjackServer(configuration,logEventListener).start();
     }
 }

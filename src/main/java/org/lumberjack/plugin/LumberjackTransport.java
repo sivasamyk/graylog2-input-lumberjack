@@ -42,6 +42,7 @@ public class LumberjackTransport implements Transport {
     private LumberjackServer lumberjackServer;
     private static final String CK_KEYSTORE_PATH = "keystorePath";
     private static final String CK_KEYSTORE_PASSWORD = "keystorePassword";
+    private static final String CK_KEY_PASSWORD = "keyPassword";
     private static final String CK_BIND_IP = "bindIP";
     private static final String CK_BIND_PORT = "bindPort";
 
@@ -82,6 +83,7 @@ public class LumberjackTransport implements Transport {
         serverConfiguration.setPort(configuration.getInt(CK_BIND_PORT));
         serverConfiguration.setKeyStorePath(configuration.getString(CK_KEYSTORE_PATH));
         serverConfiguration.setKeyStorePass(configuration.getString(CK_KEYSTORE_PASSWORD));
+        serverConfiguration.setKeyPass(configuration.getString(CK_KEY_PASSWORD));
         LOGGER.info("Starting LumberjackTransport with config :" + configuration);
         lumberjackServer = new LumberjackServer(serverConfiguration,
                 listener);
@@ -133,7 +135,13 @@ public class LumberjackTransport implements Transport {
             cr.addField(new TextField(CK_KEYSTORE_PASSWORD,
                     "Keystore Password",
                     "",
-                    "Keystore password",
+                    "-deststorepass argument in keytool",
+                    ConfigurationField.Optional.NOT_OPTIONAL,
+                    TextField.Attribute.IS_PASSWORD));
+            cr.addField(new TextField(CK_KEY_PASSWORD,
+                    "Key Password",
+                    "",
+                    "-destkeypass argument in keytool",
                     ConfigurationField.Optional.NOT_OPTIONAL,
                     TextField.Attribute.IS_PASSWORD));
             cr.addField(new TextField(CK_BIND_IP,

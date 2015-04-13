@@ -4,7 +4,7 @@ package org.lumberjack.server;
  * Created on 11/4/15.
  */
 public class ServerConfiguration {
-    private String keyStorePath, keyStorePass, ipAddress;
+    private String keyStorePath, keyStorePass, keyPass, ipAddress;
     private int port;
 
     public String getKeyStorePath() {
@@ -46,5 +46,13 @@ public class ServerConfiguration {
                 ", ipAddress='" + ipAddress + '\'' +
                 ", port=" + port +
                 '}';
+    }
+
+    public String getKeyPass() {
+        return keyPass;
+    }
+
+    public void setKeyPass(String keyPass) {
+        this.keyPass = keyPass;
     }
 }

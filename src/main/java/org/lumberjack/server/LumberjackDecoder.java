@@ -21,7 +21,8 @@ public class LumberjackDecoder extends FrameDecoder {
 
     private long windowSize;
     private long sequenceNumber;
-    private final Logger LOG = LoggerFactory.getLogger(LumberjackDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LumberjackDecoder.class);
+
 
     private final byte FRAME_WINDOWSIZE = 0x57, FRAME_DATA = 0x44, FRAME_COMPRESSED = 0x43, FRAME_ACK = 0x41;
 
@@ -49,7 +50,7 @@ public class LumberjackDecoder extends FrameDecoder {
                 processWindowSizeFrame(channelBuffer);
                 break;
             case FRAME_DATA: //'D'
-                logEvents = Arrays.asList(processDataFrame(channelBuffer));
+                logEvents = Collections.singletonList(processDataFrame(channelBuffer));
                 //eventListener.onEvent(logEvent);
                 break;
             case FRAME_COMPRESSED: //'C'
@@ -97,7 +98,7 @@ public class LumberjackDecoder extends FrameDecoder {
     }
 
     private List<LogEvent> processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws IOException {
-        List<LogEvent> logEvents = new LinkedList<LogEvent>();
+        List<LogEvent> logEvents = new LinkedList<>();
         while (channelBuffer.readable()) {
             logEvents.addAll(processBuffer(channel, channelBuffer));
         }
@@ -116,7 +117,7 @@ public class LumberjackDecoder extends FrameDecoder {
     private LogEvent processDataFrame(ChannelBuffer channelBuffer) {
         sequenceNumber = channelBuffer.readUnsignedInt();
         long pairCount = channelBuffer.readUnsignedInt();
-        Map<String, String> logDataMap = new HashMap<String, String>((int) pairCount);
+        Map<String, String> logDataMap = new HashMap<>((int) pairCount);
         for (int i = 0; i < pairCount; i++) {
             long keyLength = channelBuffer.readUnsignedInt();
             byte[] bytes = new byte[(int) keyLength];
@@ -140,8 +141,7 @@ public class LumberjackDecoder extends FrameDecoder {
 //    }
 
     private LogEvent createLogEvent(Map<String, String> logDataMap) {
-        LogEvent logEvent = new LogEvent(logDataMap);
-        return logEvent;
+        return new LogEvent(logDataMap);
     }
 
     private void sendAck(final Channel channel) throws IOException {
@@ -155,7 +155,7 @@ public class LumberjackDecoder extends FrameDecoder {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
         super.exceptionCaught(ctx, e);
-        LOG.warn("Exception while process channel. So closing the channel " + ctx.getChannel(), e.getCause());
+        LOGGER.warn("Exception while process channel. So closing the channel " + ctx.getChannel(), e.getCause());
         e.getChannel().close();
     }
 }

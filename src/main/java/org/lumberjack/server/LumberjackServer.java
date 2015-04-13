@@ -6,16 +6,17 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.DefaultChannelPipeline;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.ssl.SslHandler;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created on 7/4/15.
@@ -24,6 +25,7 @@ public class LumberjackServer {
     private ServerBootstrap bootstrap;
     private LogEventListener eventListener;
     private ServerConfiguration configuration;
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(LumberjackServer.class);
 
     public LumberjackServer(ServerConfiguration configuration,
                             LogEventListener eventListener) {
@@ -49,10 +51,10 @@ public class LumberjackServer {
         bootstrap.bind(new InetSocketAddress(configuration.getIpAddress(), configuration.getPort()));
     }
 
-    private SSLEngine getSSLEngine() {
-        SSLContext context = null;
+    private SSLEngine getSSLEngine() throws GeneralSecurityException, IOException {
+        SSLContext context;
         char[] storepass = configuration.getKeyStorePass().toCharArray();
-//        char[] keypass = "infinera".toCharArray();
+        char[] keypass = configuration.getKeyPass().toCharArray();
         String storePath = configuration.getKeyStorePath();
 
         try {
@@ -62,10 +64,12 @@ public class LumberjackServer {
             KeyStore ks = KeyStore.getInstance("JKS");
             ks.load(fin, storepass);
 
-            kmf.init(ks, storepass);
+            kmf.init(ks, keypass);
             context.init(kmf.getKeyManagers(), null, null);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (GeneralSecurityException | IOException e) {
+            //e.printStackTrace();
+            LOGGER.warn("Exception while creating channel pipeline",e);
+            throw e;
         }
         SSLEngine engine = context.createSSLEngine();
         engine.setUseClientMode(false);
