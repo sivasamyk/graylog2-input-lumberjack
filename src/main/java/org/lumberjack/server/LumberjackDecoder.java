@@ -19,8 +19,8 @@ import java.util.zip.InflaterInputStream;
  */
 public class LumberjackDecoder extends FrameDecoder {
 
-    private long windowSize;
-    private long sequenceNumber;
+    private long nextAckSeqNum;
+    private long sequenceNum,prevSequenceNum;
     private static final Logger LOGGER = LoggerFactory.getLogger(LumberjackDecoder.class);
 
 
@@ -51,15 +51,21 @@ public class LumberjackDecoder extends FrameDecoder {
                 break;
             case FRAME_DATA: //'D'
                 logEvents = Collections.singletonList(processDataFrame(channelBuffer));
-                //eventListener.onEvent(logEvent);
+
+                //Handle sequence number roll-over. Send ack for prev seq num and start from 0
+                if(sequenceNum < prevSequenceNum)
+                {
+                    sendAck(channel,prevSequenceNum);
+                    nextAckSeqNum = 0;
+                }
+                //send ack
+                else if (sequenceNum == nextAckSeqNum) {
+                    sendAck(channel,sequenceNum);
+                }
                 break;
             case FRAME_COMPRESSED: //'C'
                 logEvents = processCompressedFrame(channel, channelBuffer);
                 break;
-        }
-        if (windowSize != 0 && sequenceNumber == windowSize) {
-            sendAck(channel);
-//            System.out.println("Total Log Count " + logCount);
         }
         return logEvents;
     }
@@ -109,13 +115,16 @@ public class LumberjackDecoder extends FrameDecoder {
         if (channelBuffer.readableBytes() < 4) {
             channelBuffer.resetReaderIndex();
         } else {
-            windowSize = channelBuffer.readUnsignedInt();
-//            System.out.println("Window Size " + windowSize);
+            long windowSize = channelBuffer.readUnsignedInt();
+            nextAckSeqNum = sequenceNum + windowSize;
+            //LOGGER.warn("Window size ->" + windowSize + " next ack seq num " + nextAckSeqNum);
         }
     }
 
     private LogEvent processDataFrame(ChannelBuffer channelBuffer) {
-        sequenceNumber = channelBuffer.readUnsignedInt();
+        prevSequenceNum = sequenceNum;
+        sequenceNum = channelBuffer.readUnsignedInt();
+        //LOGGER.warn("Sequence number ->" + sequenceNum);
         long pairCount = channelBuffer.readUnsignedInt();
         Map<String, String> logDataMap = new HashMap<>((int) pairCount);
         for (int i = 0; i < pairCount; i++) {
@@ -144,10 +153,11 @@ public class LumberjackDecoder extends FrameDecoder {
         return new LogEvent(logDataMap);
     }
 
-    private void sendAck(final Channel channel) throws IOException {
+    private void sendAck(final Channel channel, long seqNum) throws IOException {
+        //LOGGER.warn("Sending Ack for " + seqNum);
         ChannelBuffer buffer = ChannelBuffers.buffer(6);
         buffer.writeBytes(new byte[]{0x31, FRAME_ACK});
-        buffer.writeInt((int) sequenceNumber);
+        buffer.writeInt((int) seqNum);
         ChannelFuture future = channel.write(buffer);
         future.awaitUninterruptibly();
     }
