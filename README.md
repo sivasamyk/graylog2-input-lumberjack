@@ -28,15 +28,20 @@ How To
 Following are the steps to integrate this plugin with Graylog server and index the files
 
 ### Copy the plugin to Graylog plugins directory
-* Download the plugin [jar] () and copy the jar to plugin directory in Graylog server installation
+* Download the plugin [jar] (https://github.com/sivasamyk/graylog2-input-lumberjack/raw/master/graylog2-input-lumberjack-1.0.0-rc1.jar) and copy the jar to plugin directory in Graylog server installation
 
 ### Generate SSL certificates
 * Generate SSL certificates to be used for transport using following command (for further information refer logstash-forwarder [documentation] (https://github.com/elastic/logstash-forwarder/))
+
      `openssl req -x509  -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.crt -subj /CN=<graylog-server-name>`
 * Export these certificates 
+
      `openssl pkcs12 -export -in lumberjack.crt -inkey lumberjack.key -out lumberjack.p12 -name localhost -passin pass:<password> -passout pass:<store-pass>`
+     
 * Import the certificates using keytool. 
+
      `keytool -importkeystore -srckeystore lumberjack.p12 -srcstoretype PKCS12 -srcstorepass <store-pass> -alias <graylog-server-name> -deststorepass <keystore-pass> -destkeypass <key-pass> -destkeystore lumberjack.jks`
+     
 * The above commands will generate following files lumberjack.crt, lumberjack.key, lumberjack.jks
    
 ### Configure plugin in Graylog 
