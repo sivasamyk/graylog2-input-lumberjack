@@ -45,32 +45,6 @@ Following are the steps to integrate this plugin with Graylog server and index t
      ![Logstash-forwarder input configuration] (https://raw.githubusercontent.com/sivasamyk/graylog2-input-lumberjack/master/input-config.png)
 
 ### Create logstash-forwarder configuration file
-* Create logstash-forwarder configuration file
-
-{
-  "network": {
-    "servers": [ "<graylog-server-name>:5043" ],
-
-    # The path to your client ssl key (optional)
-    "ssl key": "lumberjack.key",
-
-    # The path to your trusted ssl CA file. This is used
-    # to authenticate your downstream server.
-    "ssl ca": "lumberjack.crt",        
-    "timeout": 15
-  },
-
-  # The list of files configurations
-  "files": [
-    # An array of hashes. Each hash tells what paths to watch and
-    # what fields to annotate on events from those paths.
-    {
-      "paths": [
-        
-      ]
-    }
-  ]
-}
 
 ### Start indexing the files
 * Launch logstash-frowarder with -config option
