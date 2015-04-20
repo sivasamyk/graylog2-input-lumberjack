@@ -1,6 +1,7 @@
 package org.lumberjack.server;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
@@ -27,5 +28,10 @@ public class LogEventHandler extends SimpleChannelHandler {
             List<LogEvent> events = (List<LogEvent>)message;
             eventListener.onEvents(events);
         }
+    }
+
+    @Override
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        super.channelClosed(ctx, e);
     }
 }

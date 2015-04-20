@@ -21,5 +21,61 @@ This project is using Maven 3 and requires Java 7 or higher. The plugin will req
      this [link] (http://www.cloudera.com/content/cloudera/en/documentation/core/v5-2-x/topics/cm_sg_openssl_jks.html)
     * Keystore password
     * Key Password
+    
+How To
+------
+
+Following are the steps to integrate this plugin with Graylog server and index the files
+
+### Copy the plugin to Graylog plugins directory
+* Download the plugin [jar] () and copy the jar to plugin directory in Graylog server installation
+
+### Generate SSL certificates
+* Generate SSL certificates to be used for transport using following command (for further information refer logstash-forwarder [documentation] (https://github.com/elastic/logstash-forwarder/))
+     `openssl req -x509  -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.crt -subj /CN=<graylog-server-name>`
+* Export these certificates 
+     `openssl pkcs12 -export -in lumberjack.crt -inkey lumberjack.key -out lumberjack.p12 -name localhost -passin pass:<password> -passout pass:<store-pass>`
+* Import the certificates using keytool. 
+     `keytool -importkeystore -srckeystore lumberjack.p12 -srcstoretype PKCS12 -srcstorepass <store-pass> -alias <graylog-server-name> -deststorepass <keystore-pass> -destkeypass <key-pass> -destkeystore lumberjack.jks`
+* The above commands will generate following files lumberjack.crt, lumberjack.key, lumberjack.jks
+   
+### Configure plugin in Graylog 
+* Create new input of type "Logstash-forwarder Input" 
+     
+     ![Logstash-forwarder input configuration] (https://raw.githubusercontent.com/sivasamyk/graylog2-input-lumberjack/master/input-config.png)
+
+### Create logstash-forwarder configuration file
+* Create logstash-forwarder configuration file
+
+{
+  "network": {
+    "servers": [ "<graylog-server-name>:5043" ],
+
+    # The path to your client ssl key (optional)
+    "ssl key": "lumberjack.key",
+
+    # The path to your trusted ssl CA file. This is used
+    # to authenticate your downstream server.
+    "ssl ca": "lumberjack.crt",        
+    "timeout": 15
+  },
+
+  # The list of files configurations
+  "files": [
+    # An array of hashes. Each hash tells what paths to watch and
+    # what fields to annotate on events from those paths.
+    {
+      "paths": [
+        
+      ]
+    }
+  ]
+}
+
+### Start indexing the files
+* Launch logstash-frowarder with -config option
+* Create extractors to extract timestamp from message.
+
+
 
 
