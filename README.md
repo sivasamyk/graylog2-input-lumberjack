@@ -24,7 +24,7 @@ Following are the steps to integrate this plugin with Graylog server and index t
      `openssl req -x509  -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.crt -subj /CN=<graylog-server-name>`
 * Export these certificates 
 
-     `openssl pkcs12 -export -in lumberjack.crt -inkey lumberjack.key -out lumberjack.p12 -name localhost -passin pass:<password> -passout pass:<store-pass>`
+     `openssl pkcs12 -export -in lumberjack.crt -inkey lumberjack.key -out lumberjack.p12 -name <graylog-server-name> -passin pass:<password> -passout pass:<store-pass>`
      
 * Import the certificates using keytool. 
 
