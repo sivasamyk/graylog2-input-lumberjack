@@ -1,3 +1,4 @@
+# Logstash forwarder is replaced by Filebeat. Use [beats-input-plugin](https://github.com/sivasamyk/graylog-beats-plugin)
 # Graylog Logstash forwarder Lumberjack Input Plugin
 
 Currently the options available for reading files into graylog server are logstash and fluentd. logstash runs with bigger
